@@ -3,6 +3,8 @@
 
 from utils import calculate_distance
 from a_star_solver import a_star_search
+from datetime import datetime
+from utils import parse_time_str, is_time_in_range
 
 class CSPSolver:
     def __init__(self, deliveries, drones, adj_list, nodes_map, nfzs):
@@ -52,17 +54,23 @@ class CSPSolver:
         return base_usage * weight_factor
     
     def solve(self):
-        """
-        CSP çözücüsü: Teslimatları dronlara atar.
-        """
         print("CSP çözümü başlatılıyor...")
         assignments = {}
         unassigned_deliveries = list(self.deliveries)
         
-        # Önceliğe göre teslimatları sırala
         unassigned_deliveries.sort(key=lambda d: d.priority, reverse=True)
         
+        now = datetime.now().replace(year=1900, month=1, day=1)
+
         for delivery in unassigned_deliveries:
+            # ⏱ Zaman kontrolü
+            if delivery.time_window:
+                start_time = parse_time_str(delivery.time_window[0])
+                end_time = parse_time_str(delivery.time_window[1])
+                if not is_time_in_range(start_time, end_time, now):
+                    print(f"  ⏱ Teslimat {delivery.point_id} zaman aralığında değil, atlanıyor.")
+                    continue
+
             best_drone = None
             best_cost = float('inf')
             
@@ -90,8 +98,8 @@ class CSPSolver:
                 best_drone.current_battery -= self.estimate_battery_usage(best_cost, best_drone, delivery.weight)
                 assignments[delivery.point_id] = best_drone.drone_id
                 delivery.delivered = True
-                print(f"Teslimat {delivery.point_id} Dron {best_drone.drone_id}'ye atandı. Maliyet: {best_cost:.2f}, Pil Kullanımı: {self.estimate_battery_usage(best_cost, best_drone, delivery.weight):.2f}")
-        
+                print(f"Teslimat {delivery.point_id} → Dron {best_drone.drone_id}, Maliyet: {best_cost:.2f}, Pil: {self.estimate_battery_usage(best_cost, best_drone, delivery.weight):.2f}")
+
         print(f"Toplam {len(assignments)} teslimat atandı. {len(unassigned_deliveries) - len(assignments)} teslimat atanamadı.")
         return assignments
 

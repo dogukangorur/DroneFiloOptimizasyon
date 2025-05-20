@@ -71,3 +71,7 @@ def do_segments_intersect(p1, p2, p3, p4):
     
     return ccw(p1, p3, p4) != ccw(p2, p3, p4) and ccw(p1, p2, p3) != ccw(p1, p2, p4)
 
+def parse_time_str(time_str):
+    from datetime import datetime
+    return datetime.strptime(time_str, "%H:%M") if time_str else None
+
