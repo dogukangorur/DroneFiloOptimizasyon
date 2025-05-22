@@ -26,17 +26,22 @@ def a_star_search(adjacency_list, nodes_map, nfzs_list, start_node_id, goal_node
             neighbor_coords = nodes_map[neighbor_node_id]['coords']
 
             now = datetime.now().replace(year=1900, month=1, day=1)
-            blocked = False
+            valid_segment = True
+
             for nfz in nfzs_list:
+                # Zaman aralığı kontrolü
                 if nfz.start_time and nfz.end_time:
                     nfz_start = parse_time_str(nfz.start_time)
                     nfz_end = parse_time_str(nfz.end_time)
                     if not is_time_in_range(nfz_start, nfz_end, now):
-                        continue
+                        continue  # Bu NFZ şu anda aktif değil
+
+                # Bu segment NFZ'yi kesiyor mu?
                 if segment_crosses_polygon(current_coords, neighbor_coords, nfz.coordinates):
-                    blocked = True
+                    valid_segment = False
                     break
-            if blocked:
+
+            if not valid_segment:
                 continue
 
             tentative_g_cost = g_costs[current_node_id] + cost
