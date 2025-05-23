@@ -13,6 +13,10 @@ def main():
     MAX_MAP_X = 1000
     MAX_MAP_Y = 1000
 
+    drones_list = []  # Sadece Drone nesneleri içermeli
+    deliveries_list = []  # Sadece DeliveryPoint nesneleri içermeli
+    nfzs_list = []
+
     print("\n--- Drones Initialized ---")
     drones_list = generate_random_drones(5, MAX_MAP_X, MAX_MAP_Y)
     for drone in drones_list:
@@ -29,7 +33,8 @@ def main():
         print(nfz)
 
     print("\n--- Graph Structure Building ---")
-    nodes_map, adj_list = build_graph(drones_list, deliveries_list, nfzs_list)
+    nodes_map, adj_list = build_graph(deliveries_list, drones_list, nfzs_list)
+
 
     print("\n--- Constraint Satisfaction Problem (CSP) ---")
     csp_solver = CSPSolver(deliveries_list, drones_list, adj_list, nodes_map, nfzs_list)

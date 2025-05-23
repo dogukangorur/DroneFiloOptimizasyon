@@ -1,5 +1,6 @@
 import random
 from entities import Drone, DeliveryPoint, NoFlyZone
+from utils import is_point_in_polygon
 
 # No-Fly Zone'lar için sabit koordinat tanımlamaları
 FIXED_NFZ_1 = [
@@ -17,37 +18,59 @@ FIXED_NFZ_2 = [
     (550, 600)
 ]
 
-def generate_random_drones(num_drones=5, max_x=1000, max_y=1000):
+FIXED_NFZ_3 = [
+    (300, 600),
+    (200, 400),
+    (400, 400)
+]
+
+def generate_random_drones(num_drones, max_x, max_y):
     drones = []
     for i in range(num_drones):
-        drone_id = i + 1
-        max_weight = round(random.uniform(2.0, 10.0), 1)  # Örnek: 2.0 ile 10.0 kg arası
-        # Pil değeri üretiliyor ve Drone nesnesine iletiliyor
-        battery_capacity = random.randint(5000, 20000)  # Örnek: 5000 ile 20000 birim arası pil
-        speed = round(random.uniform(5.0, 20.0), 1)  # Örnek: 5.0 ile 20.0 birim/sn arası
-        location = (random.randint(0, max_x), random.randint(0, max_y))  # Başlangıç konumları
-        # Drone nesnesi oluşturulurken battery değeri battery_capacity olarak iletiliyor
-        drones.append(Drone(drone_id, max_weight, battery_capacity, speed, location))
+        # Sabit alan içinde drone başlangıç konumu oluştur (x: 400-600, y: 0-200)
+        start_pos = (random.randint(400, 600), random.randint(0, 200))
+        
+        max_weight = random.uniform(1.0, 5.0)
+        battery = random.randint(1000, 3000)
+        speed = random.uniform(10.0, 30.0)
+        
+        drones.append(Drone(i+1, max_weight, battery, speed, start_pos))
     return drones
 
-def generate_random_delivery_points(num_points=20, max_x=1000, max_y=1000):
+def generate_random_delivery_points(num_points, max_x, max_y):
     delivery_points = []
-    base_id = 101  # Teslimat ID'leri için başlangıç değeri
-    for i in range(num_points):
-        point_id = base_id + i
-        location = (random.randint(0, max_x), random.randint(0, max_y))
-        # Ağırlık değeri üretiliyor ve DeliveryPoint'e iletiliyor
-        weight = round(random.uniform(1.0, 5.0), 1)  # Örnek: 1.0 ile 5.0 kg arasında rastgele ağırlık
-        priority = random.randint(1, 5)  # Örnek: 1 (en düşük) ile 5 (en yüksek) arasında öncelik
-        # Zaman aralığı rastgele belirleniyor (örneğin None veya belirli bir aralık)
-        time_window = None  # İsteğe bağlı olarak zaman aralığı eklenebilir
-        if random.random() > 0.7:  # %30 ihtimalle zaman aralığı olsun
-            start_hour = random.randint(9, 15)
-            end_hour = random.randint(start_hour, 17)
-            start_minute = random.randint(0, 59)
-            end_minute = random.randint(0, 59)
-            time_window = (f"{start_hour:02d}:{start_minute:02d}", f"{end_hour:02d}:{end_minute:02d}")
+    nfzs = generate_fixed_no_fly_zones()  # No-fly zone'ları al
+    
+    point_id = 101
+    while len(delivery_points) < num_points:
+        x = random.randint(0, max_x)
+        y = random.randint(0, max_y)
+        location = (x, y)
+        
+        # No-fly zone kontrolü
+        is_in_nfz = False
+        for nfz in nfzs:
+            if is_point_in_polygon(location, nfz.coordinates):
+                is_in_nfz = True
+                break
+                
+        if is_in_nfz:
+            continue  # No-fly zone içindeyse bu konumu atla
+            
+        weight = random.uniform(0.5, 3.0)
+        priority = random.randint(1, 5)
+        
+        # Zaman aralığı (opsiyonel)
+        if random.random() > 0.5:
+            start_hour = random.randint(8, 18)
+            end_hour = min(start_hour + random.randint(1, 4), 22)
+            time_window = (f"{start_hour:02d}:00", f"{end_hour:02d}:00")
+        else:
+            time_window = None
+            
         delivery_points.append(DeliveryPoint(point_id, location, weight, priority, time_window))
+        point_id += 1
+        
     return delivery_points
 
 def generate_fixed_no_fly_zones():
@@ -63,6 +86,10 @@ def generate_fixed_no_fly_zones():
     zone_id_2 = 1002
     active_time_2 = ("13:00", "15:30")  # Sabit zaman aralığı
     no_fly_zones.append(NoFlyZone(zone_id_2, FIXED_NFZ_2, active_time_2[0], active_time_2[1]))
+
+    zone_id_3 = 1003
+    active_time_3 = ("14:00", "14:30")  # Sabit zaman aralığı
+    no_fly_zones.append(NoFlyZone(zone_id_3, FIXED_NFZ_3, active_time_3[0], active_time_3[1]))
     
     return no_fly_zones
 

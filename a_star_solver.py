@@ -1,54 +1,83 @@
 import heapq
-from utils import calculate_distance, segment_crosses_polygon, is_time_in_range, parse_time_str
+
+
+from utils import calculate_distance, is_point_in_polygon, segment_crosses_polygon, is_time_in_range, parse_time_str
 from datetime import datetime
 
-def a_star_search(adjacency_list, nodes_map, nfzs_list, start_node_id, goal_node_id):
-    open_set = []
-    heapq.heappush(open_set, (0, 0, start_node_id))
-    g_costs = {node_id: float('inf') for node_id in adjacency_list}
-    g_costs[start_node_id] = 0
+def reconstruct_path(came_from, current, goal):
+    """A* algoritmasında bulunan yolu geri oluşturur"""
+    total_path = [current]
+    while current in came_from:
+        current = came_from[current]
+        total_path.append(current)
+    
+    return list(reversed(total_path))
+
+
+def heuristic(coords1, coords2):
+    """İki koordinat arasındaki Öklid mesafesini hesaplar (kuş uçuşu mesafe)"""
+    return ((coords1[0] - coords2[0]) ** 2 + (coords1[1] - coords2[1]) ** 2) ** 0.5
+
+
+def a_star_search(adj_list, nodes_map, nfzs, start_node, goal_node):
+    if start_node not in adj_list or goal_node not in adj_list:
+        return None, float('inf')
+    
+    # Heuristic function (Euclidean distance)
+    def heuristic(node1, node2):
+        x1, y1 = nodes_map[node1]['coords']
+        x2, y2 = nodes_map[node2]['coords']
+        return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+    
+    # Priority queue for open nodes
+    open_set = [(0, start_node)]  # (f_score, node)
+    
+    # g_score: cost from start to node
+    g_score = {node: float('inf') for node in adj_list}
+    g_score[start_node] = 0
+    
+    # f_score: estimated total cost from start to goal through node
+    f_score = {node: float('inf') for node in adj_list}
+    f_score[start_node] = heuristic(start_node, goal_node)
+    
+    # For path reconstruction
     came_from = {}
-
+    
+    # Visited nodes
+    closed_set = set()
+    
     while open_set:
-        _, current_g_cost, current_node_id = heapq.heappop(open_set)
-
-        if current_node_id == goal_node_id:
-            path = []
-            while current_node_id in came_from:
-                path.append(current_node_id)
-                current_node_id = came_from[current_node_id]
-            path.append(start_node_id)
+        # Get node with lowest f_score
+        current_f, current = heapq.heappop(open_set)
+        
+        if current == goal_node:
+            # Reconstruct path
+            path = [current]
+            while current in came_from:
+                current = came_from[current]
+                path.append(current)
             path.reverse()
-            return path, g_costs[goal_node_id]
-
-        current_coords = nodes_map[current_node_id]['coords']
-        for neighbor_node_id, cost in adjacency_list.get(current_node_id, []):
-            neighbor_coords = nodes_map[neighbor_node_id]['coords']
-
-            now = datetime.now().replace(year=1900, month=1, day=1)
-            valid_segment = True
-
-            for nfz in nfzs_list:
-                # Zaman aralığı kontrolü
-                if nfz.start_time and nfz.end_time:
-                    nfz_start = parse_time_str(nfz.start_time)
-                    nfz_end = parse_time_str(nfz.end_time)
-                    if not is_time_in_range(nfz_start, nfz_end, now):
-                        continue  # Bu NFZ şu anda aktif değil
-
-                # Bu segment NFZ'yi kesiyor mu?
-                if segment_crosses_polygon(current_coords, neighbor_coords, nfz.coordinates):
-                    valid_segment = False
-                    break
-
-            if not valid_segment:
+            return path, g_score[goal_node]
+        
+        closed_set.add(current)
+        
+        # Check all neighbors
+        for neighbor, cost in adj_list[current]:
+            if neighbor in closed_set:
                 continue
-
-            tentative_g_cost = g_costs[current_node_id] + cost
-            if tentative_g_cost < g_costs[neighbor_node_id]:
-                g_costs[neighbor_node_id] = tentative_g_cost
-                came_from[neighbor_node_id] = current_node_id
-                heuristic_cost = calculate_distance(neighbor_coords, nodes_map[goal_node_id]['coords'])
-                heapq.heappush(open_set, (tentative_g_cost + heuristic_cost, tentative_g_cost, neighbor_node_id))
-
-    return [], float('inf')
+                
+            # Tentative g_score
+            tentative_g = g_score[current] + cost
+            
+            if tentative_g < g_score[neighbor]:
+                # This path is better than any previous one
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g
+                f_score[neighbor] = tentative_g + heuristic(neighbor, goal_node)
+                
+                # Add to open set if not already there
+                if all(node != neighbor for _, node in open_set):
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+    
+    # No path found
+    return None, float('inf')
