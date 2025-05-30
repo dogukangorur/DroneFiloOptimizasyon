@@ -2,26 +2,13 @@ import random
 from entities import Drone, DeliveryPoint, NoFlyZone
 from utils import is_point_in_polygon
 
-# No-Fly Zone'lar için sabit koordinat tanımlamaları
-FIXED_NFZ_1 = [
-    (200, 200),
-    (300, 200),
-    (300, 300),
-    (200, 300)
-]
-
-FIXED_NFZ_2 = [
-    (600, 500),
-    (700, 500),
-    (750, 600),
-    (650, 650),
-    (550, 600)
-]
-
-FIXED_NFZ_3 = [
-    (300, 600),
-    (200, 400),
-    (400, 400)
+NFZS = [
+    [(250, 650),(250, 750),(350, 650),(350, 750)],
+    [(600, 500),(700, 500),(750, 600),(650, 650),(550, 600)],
+    [(300, 600),(200, 400),(400, 400)],
+    [(700, 300),(700, 100),(900, 100),(900, 300)],
+    [(250, 650),(250, 750),(350, 650),(350, 750)],
+    [(300, 200),(300, 300),(400, 300),(400, 200)]
 ]
 
 def generate_random_drones(num_drones, max_x, max_y):
@@ -76,7 +63,26 @@ def generate_random_delivery_points(num_points, max_x, max_y):
 def generate_fixed_no_fly_zones():
     """Sabit No-Fly Zone nesneleri üretir."""
     no_fly_zones = []
-    
+    is_exists =[]
+    while len(is_exists) < 3:
+            new_num = random.randint(0, 5)
+            if new_num not in is_exists:
+                is_exists.append(new_num)
+
+    POSSIBLE_ACTIVE_TIMES = [
+    ("08:00", "08:30"), ("09:00", "09:45"), ("10:15", "11:00"),
+    ("11:30", "12:00"), ("13:00", "13:45"), ("14:00", "15:00"),
+    ("15:30", "16:15"), ("17:00", "17:30"),("18:00", "19:00"),("19:30", "20:30"),("19:00", "19:45")
+    ]
+
+    for i in range(0,3):
+        zone_id = 1000 + i
+        active_time = POSSIBLE_ACTIVE_TIMES[random.randint(0,9)] 
+        NFZ = NFZS[is_exists[i]]
+        no_fly_zones.append(NoFlyZone(zone_id, NFZ, active_time[0], active_time[1]))
+
+
+    """
     # İlk No-Fly Zone
     zone_id_1 = 1001  # Diğer ID'lerle karışmaması için
     active_time_1 = ("09:30", "11:00")  # Sabit zaman aralığı
@@ -90,7 +96,7 @@ def generate_fixed_no_fly_zones():
     zone_id_3 = 1003
     active_time_3 = ("14:00", "14:30")  # Sabit zaman aralığı
     no_fly_zones.append(NoFlyZone(zone_id_3, FIXED_NFZ_3, active_time_3[0], active_time_3[1]))
-    
+    """
     return no_fly_zones
 
 if __name__ == '__main__':
