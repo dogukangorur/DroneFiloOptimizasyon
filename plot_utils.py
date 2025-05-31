@@ -92,56 +92,76 @@ def plot_routes(drones, deliveries, assignments, nodes_map, nfzs, adj_list, anim
     # --ANIMATE (optional) --
     if animate and valid_paths:
         print("🎬 Animasyon başlatılıyor...")
-        
-        # Create a separate dot for each drone
+
+        # ────────────────────────────────────────────────────────────────────────
+        # 1) valid_paths ve drone_ids şimdi "teslimat bazlı" listeler:
+        #       valid_paths = [rota1, rota2, rota3, ...]
+        #       drone_ids   = [id_of_rota1, id_of_rota2, ...]
+        #
+        #    Her drone’un birden fazla rota (teslimat) varsa, bunları sırayla birleştirelim.
+        grouped_paths = []
+        grouped_drone_ids = []
+
+        # unique_drones: sıralı ve tekrarsız drone ID listesi
+        unique_drones = list(dict.fromkeys(drone_ids))
+
+        for d in unique_drones:
+            # Bu drone’ya ait tüm index’leri bul
+            indices = [i for i, dd in enumerate(drone_ids) if dd == d]
+            combined = []
+            for idx in indices:
+                path = valid_paths[idx]
+                # Eğer combined doluysa ve son nokta yeni path’ın ilk noktasına eşitse, tekrar ekleme
+                if combined and combined[-1] == path[0]:
+                    combined.extend(path[1:])
+                else:
+                    combined.extend(path)
+            grouped_paths.append(combined)
+            grouped_drone_ids.append(d)
+
+        # “Gruplanmış” haliyle devam edelim:
+        valid_paths = grouped_paths
+        drone_ids   = grouped_drone_ids
+        # ────────────────────────────────────────────────────────────────────────
+
+        # Her drone için bir nokta (dot) oluşturalım
         dots = []
-        colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta', 'yellow']
-        
+        colors = ['red', 'orange', 'purple', 'cyan', 'magenta', 'yellow']
         for i, drone_id in enumerate(drone_ids):
             color_idx = i % len(colors)
             dot, = ax.plot([], [], 'o', markersize=8, color=colors[color_idx], label=f'Drone {drone_id}')
             dots.append(dot)
-        
-        # Add legend
+
+        # Legend’da her drone bir kez görünsün:
         ax.legend(loc='upper left')
-        
+
         def init():
             for dot in dots:
                 dot.set_data([], [])
             return dots
-        
-        # Find the longest path to determine animation frames
+
+        # Artık valid_paths her biri “birleşik yol” içeren listeler
         max_frames = max(len(path) for path in valid_paths)
-        
+
         def update(frame):
             for i, (path, dot) in enumerate(zip(valid_paths, dots)):
-                # For each path, if frame is within path length, update the dot position
                 if frame < len(path):
-                    point = path[frame]
-                    dot.set_data([point[0]], [point[1]])  # Use lists to ensure it's a sequence
-                elif frame >= len(path):
-                    # Keep the dot at the last position in its path
-                    last_point = path[-1]
-                    dot.set_data([last_point[0]], [last_point[1]])  # Use lists to ensure it's a sequence
+                    x, y = path[frame]
+                else:
+                    x, y = path[-1]
+                dot.set_data([x], [y])
             return dots
-        
-        # Create the animation
-        try:
-            ani = FuncAnimation(
-                fig, 
-                update, 
-                frames=max_frames,
-                init_func=init, 
-                blit=True, 
-                interval=500,  # Slower animation (500ms between frames)
-                repeat=False
-            )
-            
-            plt.show()
-        except Exception as e:
-            print(f"Animasyon hatası: {str(e)}")
-            # If animation fails, at least show the static plot
-            plt.show()
+
+        ani = FuncAnimation(
+            fig,
+            update,
+            frames=max_frames,
+            init_func=init,
+            blit=True,
+            interval=500,
+            repeat=False
+        )
+        plt.show()
     else:
         plt.show()
 

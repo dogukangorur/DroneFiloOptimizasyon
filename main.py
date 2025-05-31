@@ -1,4 +1,4 @@
-import os
+import os 
 import time
 from datetime import datetime
 
@@ -14,6 +14,9 @@ from data_generator import generate_random_drones, generate_random_delivery_poin
 def main():
     MAX_MAP_X = 1000
     MAX_MAP_Y = 1000
+
+    # Programın başından itibaren toplam süre hesaplamak için:
+    t_total_start = time.time()
 
     print("\n--- Drones Initialized ---")
     drones_list = generate_random_drones(5, MAX_MAP_X, MAX_MAP_Y)
@@ -45,7 +48,7 @@ def main():
 
         f.write("--- Drones Initialized ---\n")
         for dr in drones_list:
-            f.write(f"Drone {dr.drone_id} | Konum: {dr.start_pos} | Kapasite: {dr.max_weight:.2f} kg | Batarya: {dr.current_battery:.2f} | Hız: {dr.speed:.2f} \n")
+            f.write(f"Drone {dr.drone_id} | Konum: {dr.start_pos} | Kapasite: {dr.max_weight:.2f} kg | Batarya: {dr.current_battery:.2f} | Hız: {dr.speed:.2f}\n")
 
         f.write("\n--- Delivery Points Generated ---\n")
         for d in deliveries_list:
@@ -120,12 +123,17 @@ def main():
 
     avg_energy = (total_energy / completed_deliveries) if completed_deliveries > 0 else 0.0
 
+    # Toplam program süresini hesaplayalım
+    t_total_end = time.time()
+    total_duration = t_total_end - t_total_start
+
     print("\n--- Özet Metrikler ---")
     print(f"Tamamlanan Teslimat Sayısı: {completed_deliveries}/{total_deliveries} (%{completion_pct:.2f})")
     print(f"Ortalama Enerji Tüketimi (ortalama mesafe): {avg_energy:.2f} birim")
-    print(f"CSP Çalışma Süresi: {csp_duration:.3f} saniye")
-    print(f"GA Çalışma Süresi: {ga_duration:.3f} saniye")
-    print(f"A* (Tüm Atamalar) Çalışma Süresi: {a_star_all_duration:.3f} saniye")
+    print(f"CSP Algoritma Çalışma Süresi: {csp_duration:.3f} saniye")
+    print(f"GA Algoritma Çalışma Süresi: {ga_duration:.3f} saniye")
+    print(f"A* (Tüm Atamalar) Algoritma Çalışma Süresi: {a_star_all_duration:.3f} saniye")
+    print(f"Toplam Program Çalışma Süresi: {total_duration:.3f} saniye")
 
 if __name__ == "__main__":
     main()
