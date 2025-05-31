@@ -3,9 +3,9 @@ from entities import Drone, DeliveryPoint, NoFlyZone
 from utils import is_point_in_polygon
 
 NFZS = [
-    [(250, 650),(250, 750),(350, 650),(350, 750)],
-    [(600, 500),(700, 500),(750, 600),(650, 650),(550, 600)],
-    [(300, 600),(200, 400),(400, 400)],
+    [(250, 650),(250, 750),(350, 750),(350, 650)],
+    [(600, 500),(600, 400),(750, 400),(750, 500)],
+    [(300, 600),(200, 400),(400, 400),(500, 600)],
     [(700, 300),(700, 100),(900, 100),(900, 300)],
     [(250, 650),(250, 750),(350, 650),(350, 750)],
     [(300, 200),(300, 300),(400, 300),(400, 200)]
@@ -14,19 +14,19 @@ NFZS = [
 def generate_random_drones(num_drones, max_x, max_y):
     drones = []
     for i in range(num_drones):
-        # Sabit alan içinde drone başlangıç konumu oluştur (x: 400-600, y: 0-200)
+        # Sabit alan içinde drone başlangıç konumu oluştur
         start_pos = (random.randint(400, 600), random.randint(0, 200))
         
-        max_weight = random.uniform(1.0, 5.0)
-        battery = random.randint(1000, 3000)
-        speed = random.uniform(10.0, 30.0)
+        max_weight = random.uniform(2.0, 6.0)
+        battery = random.randint(8000, 20000)
+        speed = random.uniform(8.0, 15.0)
         
         drones.append(Drone(i+1, max_weight, battery, speed, start_pos))
     return drones
 
 def generate_random_delivery_points(num_points, max_x, max_y):
     delivery_points = []
-    nfzs = generate_fixed_no_fly_zones()  # No-fly zone'ları al
+    nfzs = generate_fixed_no_fly_zones()  
     
     point_id = 101
     while len(delivery_points) < num_points:
@@ -42,7 +42,7 @@ def generate_random_delivery_points(num_points, max_x, max_y):
                 break
                 
         if is_in_nfz:
-            continue  # No-fly zone içindeyse bu konumu atla
+            continue  
             
         weight = random.uniform(0.5, 3.0)
         priority = random.randint(1, 5)
