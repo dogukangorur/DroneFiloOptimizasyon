@@ -10,11 +10,15 @@ from csp_solver import CSPSolver
 from ga_optimizer import GAOptimizer
 from plot_utils import plot_routes
 from data_generator import generate_random_drones, generate_random_delivery_points, generate_fixed_no_fly_zones
+from kpi_plot_utils import plot_kpis
+
 
 def main():
     MAX_MAP_X = 1000
     MAX_MAP_Y = 1000
 
+    # --- hazırlık ---
+    all_paths = {}           # ① başlat
     # Programın başından itibaren toplam süre hesaplamak için:
     t_total_start = time.time()
 
@@ -97,6 +101,10 @@ def main():
     for d_id, dr_id in ga_assignments.items():
         start_node = f"D{dr_id}_START"
         goal_node = str(d_id)
+        path, cost = a_star_search(adj_list, nodes_map, nfzs_list,
+                                   start_node, goal_node)
+
+        all_paths[d_id] = (path, cost)
         found_path, total_cost = a_star_search(adj_list, nodes_map, nfzs_list, start_node, goal_node)
         if found_path:
             all_paths[d_id] = (found_path, total_cost)
@@ -126,6 +134,24 @@ def main():
     # Toplam program süresini hesaplayalım
     t_total_end = time.time()
     total_duration = t_total_end - t_total_start
+    
+     # --- Tüm rotalar bittikten sonra KPI ---
+    distance_km     = {}
+    route_extension = {}
+
+    for d_id, (path, cost) in all_paths.items():   # ③ güvenle okuyoruz
+        dr_id       = ga_assignments[d_id]
+        drone_obj   = next(dr for dr in drones_list if dr.drone_id == dr_id)
+        delivery_pt = next(dp for dp in deliveries_list
+                           if dp.point_id == d_id)
+
+        distance_km[d_id] = cost / 1000
+
+        straight = calculate_distance(drone_obj.start_pos,
+                                      delivery_pt.location)
+        route_extension[d_id] = cost / straight if straight else 1.0
+
+    plot_kpis(drones_list, distance_km, route_extension)
 
     print("\n--- Özet Metrikler ---")
     print(f"Tamamlanan Teslimat Sayısı: {completed_deliveries}/{total_deliveries} (%{completion_pct:.2f})")

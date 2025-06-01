@@ -1,0 +1,35 @@
+# Drone Filo Verisi - 2025-06-01 10:07
+
+--- Drones Initialized ---
+Drone 1 | Konum: (522, 52) | Kapasite: 5.21 kg | Batarya: 12055.00 | Hız: 9.19
+Drone 2 | Konum: (598, 121) | Kapasite: 2.95 kg | Batarya: 14765.00 | Hız: 8.20
+Drone 3 | Konum: (498, 100) | Kapasite: 2.27 kg | Batarya: 15801.00 | Hız: 11.73
+Drone 4 | Konum: (494, 107) | Kapasite: 2.51 kg | Batarya: 16890.00 | Hız: 10.86
+Drone 5 | Konum: (589, 31) | Kapasite: 5.17 kg | Batarya: 10570.00 | Hız: 8.78
+
+--- Delivery Points Generated ---
+Teslimat 101 | Konum: (890, 423) | Ağırlık: 2.27 kg | Öncelik: 2 | Time Window: 17:00-19:00
+Teslimat 102 | Konum: (69, 941) | Ağırlık: 2.60 kg | Öncelik: 5 | Time Window: 13:00-16:00
+Teslimat 103 | Konum: (248, 365) | Ağırlık: 1.64 kg | Öncelik: 2 | Time Window: 16:00-18:00
+Teslimat 104 | Konum: (248, 964) | Ağırlık: 0.99 kg | Öncelik: 1 | Time Window: None
+Teslimat 105 | Konum: (389, 12) | Ağırlık: 2.91 kg | Öncelik: 2 | Time Window: None
+Teslimat 106 | Konum: (539, 843) | Ağırlık: 0.89 kg | Öncelik: 2 | Time Window: 08:00-10:00
+Teslimat 107 | Konum: (133, 911) | Ağırlık: 1.22 kg | Öncelik: 1 | Time Window: None
+Teslimat 108 | Konum: (730, 506) | Ağırlık: 2.09 kg | Öncelik: 5 | Time Window: 18:00-19:00
+Teslimat 109 | Konum: (905, 626) | Ağırlık: 2.83 kg | Öncelik: 2 | Time Window: None
+Teslimat 110 | Konum: (469, 939) | Ağırlık: 2.45 kg | Öncelik: 5 | Time Window: 15:00-17:00
+Teslimat 111 | Konum: (784, 45) | Ağırlık: 1.81 kg | Öncelik: 5 | Time Window: 13:00-15:00
+Teslimat 112 | Konum: (830, 626) | Ağırlık: 2.63 kg | Öncelik: 5 | Time Window: 10:00-13:00
+Teslimat 113 | Konum: (993, 741) | Ağırlık: 2.87 kg | Öncelik: 3 | Time Window: None
+Teslimat 114 | Konum: (994, 371) | Ağırlık: 1.82 kg | Öncelik: 4 | Time Window: 14:00-17:00
+Teslimat 115 | Konum: (653, 403) | Ağırlık: 1.52 kg | Öncelik: 4 | Time Window: None
+Teslimat 116 | Konum: (532, 931) | Ağırlık: 2.85 kg | Öncelik: 4 | Time Window: None
+Teslimat 117 | Konum: (721, 991) | Ağırlık: 1.85 kg | Öncelik: 2 | Time Window: 10:00-11:00
+Teslimat 118 | Konum: (112, 401) | Ağırlık: 2.23 kg | Öncelik: 1 | Time Window: 12:00-15:00
+Teslimat 119 | Konum: (565, 243) | Ağırlık: 1.33 kg | Öncelik: 2 | Time Window: None
+Teslimat 120 | Konum: (514, 246) | Ağırlık: 2.45 kg | Öncelik: 1 | Time Window: 08:00-09:00
+
+--- No-Fly Zones Initialized ---
+NFZ 1000 → Köşeler: [(700,300), (700,100), (900,100), (900,300)]
+NFZ 1001 → Köşeler: [(250,650), (250,750), (350,750), (350,650)]
+NFZ 1002 → Köşeler: [(600,500), (600,400), (750,400), (750,500)]

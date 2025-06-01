@@ -3,6 +3,7 @@
 from utils import calculate_distance, is_point_in_polygon
 from a_star_solver import a_star_search
 from datetime import datetime
+from entities import Drone
 
 
 class CSPSolver:
@@ -115,6 +116,11 @@ class CSPSolver:
                     drone = best_drone
                     usage = self.estimate_battery_usage(best_cost, drone, delivery.weight)
                     drone.current_battery -= usage
+                    
+                    pct = 100 * drone.current_battery / drone.battery_capacity
+                    drone.battery_history.append(pct)            # ➕
+                    drone.time_ticks.append(len(drone.battery_history))  # ➕ basit adım sayacı
+
                     # Drone'un şimdiki düğümünü "delivery.point_id" node ID'si olarak güncelleyelim
                     drone.last_node_id = str(delivery.point_id)
 
