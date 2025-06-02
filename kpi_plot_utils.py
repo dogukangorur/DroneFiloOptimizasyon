@@ -11,7 +11,7 @@ def plot_kpis(drones, distance_km, route_extension):
     fig, axs = plt.subplots(1, 3, figsize=(18, 4))
     fig.suptitle("Drone KPI Görselleştirmeleri", fontsize=14)
 
-    # 1) Batarya eğrisi
+    # Batarya eğrisi
     for dr in drones:
         axs[0].plot(dr.time_ticks, dr.battery_history, label=f"D{dr.drone_id}")
     axs[0].set_ylabel("%")
@@ -19,7 +19,7 @@ def plot_kpis(drones, distance_km, route_extension):
     axs[0].set_title("Batarya Deşarj Eğrisi")
     axs[0].legend()
 
-    # 2) Teslimat başı km
+    # Teslimat başı km
     ids   = list(distance_km.keys())
     kms   = [distance_km[i] for i in ids]
     axs[1].bar(ids, kms)
@@ -27,7 +27,7 @@ def plot_kpis(drones, distance_km, route_extension):
     axs[1].set_xlabel("Teslimat ID")
     axs[1].set_title("Teslimat Başı Kat Edilen km")
 
-    # 3) Rota uzama oranı
+    # Rota uzama oranı
     ratios = [route_extension[i] for i in ids]
     axs[2].bar(ids, ratios, color="orange")
     axs[2].axhline(1.0, ls="--", lw=1, label="Kuş uçuşu = 1.0")

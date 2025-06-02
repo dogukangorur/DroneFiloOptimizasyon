@@ -14,7 +14,7 @@ NFZS = [
 def generate_random_drones(num_drones, max_x, max_y):
     drones = []
     for i in range(num_drones):
-        # Sabit alan içinde drone başlangıç konumu oluştur
+        
         start_pos = (random.randint(400, 600), random.randint(0, 200))
         
         max_weight = random.uniform(2.0, 6.0)
@@ -47,7 +47,7 @@ def generate_random_delivery_points(num_points, max_x, max_y):
         weight = random.uniform(0.5, 3.0)
         priority = random.randint(1, 5)
         
-        # Zaman aralığı (opsiyonel)
+        # Zaman aralığı
         if random.random() > 0.5:
             start_hour = random.randint(8, 18)
             end_hour = min(start_hour + random.randint(1, 4), 22)
@@ -61,7 +61,6 @@ def generate_random_delivery_points(num_points, max_x, max_y):
     return delivery_points
 
 def generate_fixed_no_fly_zones():
-    """Sabit No-Fly Zone nesneleri üretir."""
     no_fly_zones = []
     is_exists =[]
     while len(is_exists) < 3:
@@ -81,22 +80,6 @@ def generate_fixed_no_fly_zones():
         NFZ = NFZS[is_exists[i]]
         no_fly_zones.append(NoFlyZone(zone_id, NFZ, active_time[0], active_time[1]))
 
-
-    """
-    # İlk No-Fly Zone
-    zone_id_1 = 1001  # Diğer ID'lerle karışmaması için
-    active_time_1 = ("09:30", "11:00")  # Sabit zaman aralığı
-    no_fly_zones.append(NoFlyZone(zone_id_1, FIXED_NFZ_1, active_time_1[0], active_time_1[1]))
-    
-    # İkinci No-Fly Zone
-    zone_id_2 = 1002
-    active_time_2 = ("13:00", "15:30")  # Sabit zaman aralığı
-    no_fly_zones.append(NoFlyZone(zone_id_2, FIXED_NFZ_2, active_time_2[0], active_time_2[1]))
-
-    zone_id_3 = 1003
-    active_time_3 = ("14:00", "14:30")  # Sabit zaman aralığı
-    no_fly_zones.append(NoFlyZone(zone_id_3, FIXED_NFZ_3, active_time_3[0], active_time_3[1]))
-    """
     return no_fly_zones
 
 if __name__ == '__main__':

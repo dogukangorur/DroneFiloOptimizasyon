@@ -23,35 +23,35 @@ def a_star_search(adj_list, nodes_map, nfzs, start_node, goal_node):
     if start_node not in adj_list or goal_node not in adj_list:
         return None, float('inf')
     
-    # Heuristic function (Euclidean distance)
+    
     def heuristic(node1, node2):
         x1, y1 = nodes_map[node1]['coords']
         x2, y2 = nodes_map[node2]['coords']
         return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
     
-    # Priority queue for open nodes
+    
     open_set = [(0, start_node)]  # (f_score, node)
     
-    # g_score: cost from start to node
+   
     g_score = {node: float('inf') for node in adj_list}
     g_score[start_node] = 0
     
-    # f_score: estimated total cost from start to goal through node
+    
     f_score = {node: float('inf') for node in adj_list}
     f_score[start_node] = heuristic(start_node, goal_node)
     
-    # For path reconstruction
+    
     came_from = {}
     
-    # Visited nodes
+    
     closed_set = set()
     
     while open_set:
-        # Get node with lowest f_score
+       
         current_f, current = heapq.heappop(open_set)
         
         if current == goal_node:
-            # Reconstruct path
+           
             path = [current]
             while current in came_from:
                 current = came_from[current]
@@ -61,23 +61,23 @@ def a_star_search(adj_list, nodes_map, nfzs, start_node, goal_node):
         
         closed_set.add(current)
         
-        # Check all neighbors
+        
         for neighbor, cost in adj_list[current]:
             if neighbor in closed_set:
                 continue
                 
-            # Tentative g_score
+            
             tentative_g = g_score[current] + cost
             
             if tentative_g < g_score[neighbor]:
-                # This path is better than any previous one
+                
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g
                 f_score[neighbor] = tentative_g + heuristic(neighbor, goal_node)
                 
-                # Add to open set if not already there
+                
                 if all(node != neighbor for _, node in open_set):
                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
     
-    # No path found
+    
     return None, float('inf')

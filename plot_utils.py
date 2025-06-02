@@ -31,14 +31,9 @@ def plot_routes(drones, deliveries, assignments, nodes_map, nfzs, adj_list, anim
         ax.text(x+5, y+5, f"T{delivery.point_id}", fontsize=8)
 
     # --- GENERATE NFZ EDGE POINTS ---
-    # Extract the edge points directly from the NFZ polygons with minimal safety margin
+ 
     edge_points = extract_nfz_edge_points(nfzs, safety_margin=2)
     
-    # Optionally plot the edge points (for debugging)
-    # for point in edge_points:
-    #     ax.plot(point[0], point[1], 'mx', markersize=3)
-
-    # --- ROUTES (with NFZ avoidance along edges) --- 
     valid_paths = []
     drone_ids = []
     
@@ -89,20 +84,15 @@ def plot_routes(drones, deliveries, assignments, nodes_map, nfzs, adj_list, anim
     plt.grid(True)
     plt.tight_layout()
 
-    # --ANIMATE (optional) --
+    # ANIMATE 
     if animate and valid_paths:
         print("🎬 Animasyon başlatılıyor...")
 
-        # ────────────────────────────────────────────────────────────────────────
-        # 1) valid_paths ve drone_ids şimdi "teslimat bazlı" listeler:
-        #       valid_paths = [rota1, rota2, rota3, ...]
-        #       drone_ids   = [id_of_rota1, id_of_rota2, ...]
-        #
-        #    Her drone’un birden fazla rota (teslimat) varsa, bunları sırayla birleştirelim.
+        
         grouped_paths = []
         grouped_drone_ids = []
 
-        # unique_drones: sıralı ve tekrarsız drone ID listesi
+        
         unique_drones = list(dict.fromkeys(drone_ids))
 
         for d in unique_drones:
@@ -122,7 +112,7 @@ def plot_routes(drones, deliveries, assignments, nodes_map, nfzs, adj_list, anim
         # “Gruplanmış” haliyle devam edelim:
         valid_paths = grouped_paths
         drone_ids   = grouped_drone_ids
-        # ────────────────────────────────────────────────────────────────────────
+        
 
         # Her drone için bir nokta (dot) oluşturalım
         dots = []
@@ -166,17 +156,7 @@ def plot_routes(drones, deliveries, assignments, nodes_map, nfzs, adj_list, anim
         plt.show()
 
 def extract_nfz_edge_points(nfzs, safety_margin=2, points_per_edge=10):
-    """
-    Extract points directly from the edges of NFZ polygons with minimal safety margin.
     
-    Args:
-        nfzs: List of no-fly zone objects
-        safety_margin: Minimal distance from the NFZ boundary in meters
-        points_per_edge: Number of points to extract per edge
-        
-    Returns:
-        List of (x, y) coordinates along NFZ edges
-    """
     edge_points = []
     
     for nfz in nfzs:
@@ -257,20 +237,6 @@ def segment_dist(p1, p2):
     return np.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
 
 def find_path_along_nfz_edges(start, end, nfzs, edge_points, max_nodes=15):
-    """
-    Find a path from start to end that navigates along NFZ edges.
-    Uses a modified A* algorithm to find the shortest path.
-    
-    Args:
-        start: (x, y) start coordinate
-        end: (x, y) end coordinate
-        nfzs: List of no-fly zone objects
-        edge_points: List of (x, y) coordinates along NFZ edges
-        max_nodes: Maximum number of nodes in the path to prevent overly complex routes
-        
-    Returns:
-        List of (x, y) coordinates forming a path, or None if no path found
-    """
     # Include start and end in potential path nodes
     all_points = [start] + edge_points + [end]
     
@@ -295,23 +261,17 @@ def find_path_along_nfz_edges(start, end, nfzs, edge_points, max_nodes=15):
                     dist = segment_dist(p1, p2)
                     connections[i].append((j, dist))
     
-    # A* algorithm
-    # Create open and closed sets
-    open_set = {0}  # Start with the start node
+    open_set = {0}  
     closed_set = set()
     
-    # g_score: cost from start to current node
     g_score = {i: float('inf') for i in range(len(all_points))}
     g_score[0] = 0
     
-    # f_score: g_score + heuristic (estimated cost to end)
     f_score = {i: float('inf') for i in range(len(all_points))}
-    f_score[0] = segment_dist(start, end)  # Heuristic for start node
+    f_score[0] = segment_dist(start, end)  
     
-    # came_from: to reconstruct the path
     came_from = {}
     
-    # Number of nodes in the path so far
     path_length = {0: 1}
     
     while open_set:
@@ -352,6 +312,6 @@ def find_path_along_nfz_edges(start, end, nfzs, edge_points, max_nodes=15):
             path_length[neighbor] = path_length.get(current, 0) + 1
             f_score[neighbor] = g_score[neighbor] + segment_dist(all_points[neighbor], end)
     
-    # No path found
+    
     return None
 

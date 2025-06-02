@@ -3,11 +3,7 @@
 from a_star_solver import a_star_search
 
 class Drone:
-    """
-    Batarya/KPI metriklerini Prometheus'a yazan ve
-    kritik eşikte otomatik Return-Home yapan genişletilmiş Drone sınıfı.
-    """
-    # Prometheus metrikleri sınıf değişkeni olarak atanacak
+   
     BATTERY_PCT = None
     FAILSAFE_COUNT = None
 
@@ -23,7 +19,6 @@ class Drone:
         self.current_weight = 0.0
         self.is_busy = False
 
-        # ↪️ Fail-safe alanları
         self.home_pos = start_pos          # Dönüş hedefi
         self.critical_pct = 20             # %20 altı = kritik
         self.last_node_id = f"D{drone_id}_START"

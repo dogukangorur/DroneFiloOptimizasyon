@@ -15,10 +15,9 @@ class CSPSolver:
         self.nfzs = nfzs
 
         # Her dronun başlangıç konumu ve bataryası
-        # (entities.Drone sınıfının current_battery özniteliği zaten var.)
         for dr in self.drones:
-            dr.current_location = dr.start_pos  # Yeni öznitelik: hangi noktada bekliyor
-            # dr.current_battery zaten mevcut olmalı
+            dr.current_location = dr.start_pos  
+           
 
     def check_path_validity(self, start_node, end_node):
         """
@@ -48,46 +47,29 @@ class CSPSolver:
         return base_usage * weight_factor
 
     def solve(self):
-        """
-        Yeni yapı:
-        - Atanmamış teslimatlar listesini baştan oluştururuz.
-        - Döngü: Atanmamış teslimat kaldığı ve en az bir dron atama yaptığı sürece devam eder.
-        """
+      
         print("CSP çözümü başlatılıyor...")
         assignments = {}  # {delivery_id: drone_id}
         unassigned = [d for d in self.deliveries if not is_point_in_polygon(d.location, self.nfzs[0].coordinates) 
                       if self.nfzs] if self.nfzs else list(self.deliveries)
-        # Yukarıda: teslimatı NFZ içinde olanları çıkarıyoruz. Eğer nfzs listesi boşsa, hepsi valid.
-
-        # İsterseniz zaman penceresine burada müdahale edebilirsiniz:
-        # (Aşağıdaki zaman kontrolünü tamamen kaldırdım, 
-        #  ancak gerçek çalışma durumunda yorum satırını kaldırıp tekrar aktive edebilirsiniz.)
-        # now = datetime.now().replace(second=0, microsecond=0)
-
-        # Öncelikli olarak "daha yüksek priority" olan teslimatları önce deneyelim:
+        
         unassigned.sort(key=lambda t: t.priority, reverse=True)
 
-        # Bu döngü, "unassigned" listesinde öğe kaldığı ve
-        # bu turda en az bir atama yapılabildiği sürece devam eder.
+      
         while True:
             atama_yapildi = False
 
-            # Zaman filtresi eklemek isterseniz burada “d.time_window” kontrolü yapabilirsiniz.
+           
 
-            for delivery in unassigned[:]:  # unassigned’ın bir kopyası üzerinde dönüyoruz
+            for delivery in unassigned[:]:  
                 best_drone = None
                 best_cost = float("inf")
 
                 for drone in self.drones:
-                    # 1) Ağırlık kapasitesi kontrolü
+                    #  Ağırlık kapasitesi kontrolü
                     if not self.check_drone_capacity(drone, delivery):
                         continue
 
-                    # 2) Drone'un şimdiki konumu (string ID) gerekiyor.
-                    #    Eğer dr.current_location = (x,y) ise bunu node_id’ye dönüştüreceğiz.
-                    #    Bizim nodes_map, "D{drone_id}_START" veya teslimat ID ("101", "105") gibi string düğümler içeriyor.
-                    #    Bu nedenle, eğer dr.current_location hâlâ start_pos ise start_node o dronun "D{id}_START" düğümü:
-                    #    (Sonrasında dr.current_location = delivery.location şeklinde güncellenecek.)
                     if hasattr(drone, "last_node_id"):
                         start_node = drone.last_node_id
                     else:
@@ -95,33 +77,33 @@ class CSPSolver:
 
                     delivery_node = str(delivery.point_id)
 
-                    # 3) A* ile yol ve cost kontrolü
+                    #  A* ile yol ve cost kontrolü
                     path_valid, cost = self.check_path_validity(start_node, delivery_node)
                     if not path_valid:
                         continue
 
-                    # 4) Pil kullanımı kontrolü
+                    #  Pil kullanımı kontrolü
                     battery_usage = self.estimate_battery_usage(cost, drone, delivery.weight)
                     if battery_usage > drone.current_battery:
                         continue
 
-                    # 5) En düşük maliyetli dron araması
+                    #  En düşük maliyetli dron araması
                     if cost < best_cost:
                         best_cost = cost
                         best_drone = drone
 
                 # Eğer bu teslimata atanabilecek bir dron bulunduysa kaydedelim
                 if best_drone:
-                    # 6) Atama işlemi
+                    #  Atama işlemi
                     drone = best_drone
                     usage = self.estimate_battery_usage(best_cost, drone, delivery.weight)
                     drone.current_battery -= usage
                     
                     pct = 100 * drone.current_battery / drone.battery_capacity
-                    drone.battery_history.append(pct)            # ➕
-                    drone.time_ticks.append(len(drone.battery_history))  # ➕ basit adım sayacı
+                    drone.battery_history.append(pct)            
+                    drone.time_ticks.append(len(drone.battery_history))  
 
-                    # Drone'un şimdiki düğümünü "delivery.point_id" node ID'si olarak güncelleyelim
+                    
                     drone.last_node_id = str(delivery.point_id)
 
                     assignments[delivery.point_id] = drone.drone_id
@@ -129,11 +111,11 @@ class CSPSolver:
 
                     print(f"Teslimat {delivery.point_id} → Dron {drone.drone_id} | Maliyet: {best_cost:.2f} | Pil Kalan: {drone.current_battery:.2f}")
 
-                    # Bu teslimat, unassigned listesinden çıkarılıyor
+                   
                     unassigned.remove(delivery)
                     atama_yapildi = True
 
-            # Eğer bu turda hiç atama yapılmadıysa veya unassigned boşsa döngüden çık
+           
             if not atama_yapildi or not unassigned:
                 break
 

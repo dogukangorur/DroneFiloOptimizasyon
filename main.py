@@ -17,8 +17,7 @@ def main():
     MAX_MAP_X = 1000
     MAX_MAP_Y = 1000
 
-    # --- hazırlık ---
-    all_paths = {}           # ① başlat
+    all_paths = {}           
     # Programın başından itibaren toplam süre hesaplamak için:
     t_total_start = time.time()
 
@@ -39,7 +38,7 @@ def main():
         coords_str = ", ".join(f"({x},{y})" for x, y in nfz.coordinates)
         print(f"NFZ {nfz.zone_id} → Köşeler: [{coords_str}]")
 
-    # 🎯 VERİLERİ TXT DOSYASINA KAYDET
+    # VERİLERİ TXT DOSYASINA KAYDET
     folder_name = "data_records"
     os.makedirs(folder_name, exist_ok=True)
     now = datetime.now()
