@@ -27,3 +27,14 @@ gibi önemli operasyonel parametreler dikkate alınmaktadır.
   Paralel GPU desteği ile büyük boyutlu çözümler saniyeler içinde hesaplanır.
 - **Dinamik Yasak Uçuş Bölgeleri (YUB):**  
   Rotalar, anlık değişen kurallara otomatik olarak uyum sağlar.
+
+## Görseller
+
+<div style="width:100%;display:flex;justify-content:around-between;">
+  <img src="img/1.png" style="width:45%" height=350px>
+  <img src="img/2.png" style="width:45%" height=350px>
+</div>
+<br>
+<div style="width:100%;display:flex;justify-content:around-between;">
+  <img src="img/3.png" style="width:90%" height=350px>
+</div>  
